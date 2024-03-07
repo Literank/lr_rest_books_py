@@ -1,0 +1,9 @@
+app:
+  port: 5000
+db:
+  file_name: "test.db"
+  host: "127.0.0.1"
+  port: 3306
+  user: "test_user"
+  password: "test_pass"
+  database: "lr_book"
