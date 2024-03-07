@@ -7,3 +7,5 @@ db:
   user: "test_user"
   password: "test_pass"
   database: "lr_book"
+  mongo_uri: "mongodb://localhost:27017"
+  mongo_db_name: "lr_book"

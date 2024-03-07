@@ -10,6 +10,8 @@ class DBConfig:
     user: str
     password: str
     database: str
+    mongo_uri: str
+    mongo_db_name: str
 
 
 @dataclass
