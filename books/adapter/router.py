@@ -37,7 +37,7 @@ class RestHandler:
             return jsonify(book), 201
         except Exception as e:
             self._logger.error(f"Failed to create: {e}")
-            return jsonify({"error": "Failed to create"}), 404
+            return jsonify({"error": "Failed to create"}), 400
 
     def update_book(self, id):
         try:
