@@ -33,8 +33,14 @@ class MongoPersistence(ReviewManager):
             return None
         return Review(**_polish(review_data))
 
-    def get_reviews_of_book(self, book_id: int) -> List[Review]:
-        reviews_data = self.coll.find({"book_id": book_id})
+    def get_reviews_of_book(self, book_id: int, keyword: str) -> List[Review]:
+        filter: Dict[str, Any] = {"book_id": book_id}
+        if keyword:
+            filter["$or"] = [
+                {"title": {"$regex": keyword, "$options": "i"}},
+                {"content": {"$regex": keyword, "$options": "i"}}
+            ]
+        reviews_data = self.coll.find(filter)
         return [Review(**_polish(r)) for r in reviews_data]
 
 

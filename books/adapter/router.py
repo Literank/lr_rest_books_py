@@ -61,7 +61,8 @@ class RestHandler:
 
     def get_reviews_of_book(self, book_id: int):
         try:
-            reviews = self.review_operator.get_reviews_of_book(book_id)
+            query = request.args.get("q", type=str, default="")
+            reviews = self.review_operator.get_reviews_of_book(book_id, query)
             return jsonify(reviews), 200
         except Exception as e:
             self._logger.error(f"Failed to get reviews of book: {e}")

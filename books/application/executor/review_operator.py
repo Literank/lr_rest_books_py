@@ -21,8 +21,8 @@ class ReviewOperator():
     def get_review(self, id: str) -> Optional[Review]:
         return self.review_manager.get_review(id)
 
-    def get_reviews_of_book(self, review_id: int) -> List[Review]:
-        return self.review_manager.get_reviews_of_book(review_id)
+    def get_reviews_of_book(self, book_id: int, query: str) -> List[Review]:
+        return self.review_manager.get_reviews_of_book(book_id, query)
 
     def update_review(self, id: str, r: Review) -> Review:
         r.updated_at = datetime.now()

@@ -22,5 +22,5 @@ class ReviewManager(ABC):
         pass
 
     @abstractmethod
-    def get_reviews_of_book(self, book_id: int) -> List[Review]:
+    def get_reviews_of_book(self, book_id: int, keyword: str) -> List[Review]:
         pass
