@@ -19,4 +19,4 @@ COPY main.py /app
 EXPOSE 5000
 
 # Command to run the Flask application with Gunicorn
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "main:app"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "--log-level", "debug", "main:app"]
