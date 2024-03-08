@@ -2,7 +2,7 @@ from flask import Flask
 
 from books.adapter.router import make_router
 from books.application import WireHelper
-from books.infrastructure.config import Config, ApplicationConfig, DBConfig, parseConfig
+from books.infrastructure.config import parseConfig
 
 CONFIG_FILENAME = "config.yml"
 
