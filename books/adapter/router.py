@@ -108,7 +108,11 @@ def health():
 
 def make_router(app: Flask, wire_helper: WireHelper):
     rest_handler = RestHandler(
-        app.logger, BookOperator(wire_helper.book_manager()), ReviewOperator(wire_helper.review_manager()))
+        app.logger,
+        BookOperator(
+            wire_helper.book_manager(),
+            wire_helper.cache_helper()),
+        ReviewOperator(wire_helper.review_manager()))
     app.add_url_rule('/', view_func=health)
     app.add_url_rule('/books', view_func=rest_handler.get_books)
     app.add_url_rule('/books/<int:id>', view_func=rest_handler.get_book)

@@ -15,6 +15,14 @@ class DBConfig:
 
 
 @dataclass
+class CacheConfig:
+    host: str
+    port: int
+    password: str
+    db: int
+
+
+@dataclass
 class ApplicationConfig:
     port: int
 
@@ -22,6 +30,7 @@ class ApplicationConfig:
 @dataclass
 class Config:
     app: ApplicationConfig
+    cache: CacheConfig
     db: DBConfig
 
 
@@ -30,5 +39,6 @@ def parseConfig(filename: str) -> Config:
         data = yaml.safe_load(f)
         return Config(
             ApplicationConfig(**data['app']),
+            CacheConfig(**data['cache']),
             DBConfig(**data['db'])
         )
