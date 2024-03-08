@@ -22,5 +22,5 @@ class BookManager(ABC):
         pass
 
     @abstractmethod
-    def get_books(self, offset: int) -> List[Book]:
+    def get_books(self, offset: int, keyword: str) -> List[Book]:
         pass

@@ -61,9 +61,15 @@ class MySQLPersistence(BookManager):
             return None
         return Book(**result)
 
-    def get_books(self, offset: int) -> List[Book]:
-        self.cursor.execute('''
-            SELECT * FROM books LIMIT %s, %s
-        ''', (offset, self.page_size))
+    def get_books(self, offset: int, keyword: str) -> List[Book]:
+        query = "SELECT * FROM books"
+        params: List[Any] = []
+        if keyword:
+            query += " WHERE title LIKE %s OR author LIKE %s"
+            params = [f"%{keyword}%", f"%{keyword}%"]
+        query += " LIMIT %s, %s"
+        params.extend([offset, self.page_size])
+
+        self.cursor.execute(query, tuple(params))
         results: List[Any] = self.cursor.fetchall()
         return [Book(**result) for result in results]
