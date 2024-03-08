@@ -1,17 +1,19 @@
 import logging
 from flask import Flask, request, jsonify
 
-from ..application.executor import BookOperator, ReviewOperator
+from books.application.dto import UserCredential
+from ..application.executor import BookOperator, ReviewOperator, UserOperator
 from ..application import WireHelper
 from ..domain.model import Book, Review
 from .util import dataclass_from_dict
 
 
 class RestHandler:
-    def __init__(self, logger: logging.Logger, book_operator: BookOperator, review_operator: ReviewOperator):
+    def __init__(self, logger: logging.Logger, book_operator: BookOperator, review_operator: ReviewOperator, user_operator: UserOperator):
         self._logger = logger
         self.book_operator = book_operator
         self.review_operator = review_operator
+        self.user_operator = user_operator
 
     def get_books(self):
         try:
@@ -104,6 +106,26 @@ class RestHandler:
             self._logger.error(f"Failed to delete: {e}")
             return jsonify({"error": "Failed to delete"}), 404
 
+    def user_sign_up(self):
+        try:
+            u = dataclass_from_dict(UserCredential, request.json)
+            user = self.user_operator.create_user(u)
+            return jsonify(user), 201
+        except Exception as e:
+            self._logger.error(f"Failed to create: {e}")
+            return jsonify({"error": "Failed to create"}), 400
+
+    def user_sign_in(self):
+        try:
+            u = dataclass_from_dict(UserCredential, request.json)
+            user = self.user_operator.sign_in(u.email, u.password)
+            if user is None:
+                return jsonify({"error": f"No user with email {u.email}"}), 404
+            return jsonify(user), 200
+        except Exception as e:
+            self._logger.error(f"Failed to sign in: {e}")
+            return jsonify({"error": f"Failed to sign in: {e}"}), 400
+
 
 def health():
     return jsonify({"status": "ok"})
@@ -115,7 +137,8 @@ def make_router(app: Flask, wire_helper: WireHelper):
         BookOperator(
             wire_helper.book_manager(),
             wire_helper.cache_helper()),
-        ReviewOperator(wire_helper.review_manager()))
+        ReviewOperator(wire_helper.review_manager()),
+        UserOperator(wire_helper.user_manager()))
     app.add_url_rule('/', view_func=health)
     app.add_url_rule('/books', view_func=rest_handler.get_books)
     app.add_url_rule('/books/<int:id>', view_func=rest_handler.get_book)
@@ -134,3 +157,7 @@ def make_router(app: Flask, wire_helper: WireHelper):
                      methods=['PUT'])
     app.add_url_rule('/reviews/<id>', view_func=rest_handler.delete_review,
                      methods=['DELETE'])
+    app.add_url_rule('/users', view_func=rest_handler.user_sign_up,
+                     methods=['POST'])
+    app.add_url_rule('/users/sign-in', view_func=rest_handler.user_sign_in,
+                     methods=['POST'])

@@ -1,4 +1,4 @@
-from books.domain.gateway import BookManager, ReviewManager
+from books.domain.gateway import BookManager, ReviewManager, UserManager
 from books.infrastructure.cache import RedisCache, CacheHelper
 from ..infrastructure.config import Config
 from ..infrastructure.database import MySQLPersistence, MongoPersistence
@@ -25,3 +25,6 @@ class WireHelper:
 
     def cache_helper(self) -> CacheHelper:
         return self.kvStore
+
+    def user_manager(self) -> UserManager:
+        return self.sqlPersistence

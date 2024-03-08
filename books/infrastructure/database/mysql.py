@@ -3,11 +3,11 @@ from typing import Any, List, Optional
 
 from books.infrastructure.config import DBConfig
 
-from ...domain.gateway import BookManager
-from ...domain.model import Book
+from ...domain.gateway import BookManager, UserManager
+from ...domain.model import Book, User
 
 
-class MySQLPersistence(BookManager):
+class MySQLPersistence(BookManager, UserManager):
     def __init__(self, c: DBConfig, page_size: int):
         self.page_size = page_size
         self.conn = mysql.connector.connect(
@@ -73,3 +73,18 @@ class MySQLPersistence(BookManager):
         self.cursor.execute(query, tuple(params))
         results: List[Any] = self.cursor.fetchall()
         return [Book(**result) for result in results]
+
+    def create_user(self, u: User) -> int:
+        self.cursor.execute('''
+            INSERT INTO users (email, password, salt, is_admin, created_at, updated_at) VALUES (%s, %s, %s, %s, %s, %s)
+        ''', (u.email, u.password, u.salt, u.is_admin, u.created_at, u.updated_at))
+        return self.cursor.lastrowid or 0
+
+    def get_user_by_email(self, email: str) -> Optional[User]:
+        self.cursor.execute('''
+            SELECT * FROM users WHERE email=%s
+        ''', (email,))
+        result: Any = self.cursor.fetchone()
+        if result is None:
+            return None
+        return User(**result)
