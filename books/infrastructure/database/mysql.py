@@ -8,7 +8,8 @@ from ...domain.model import Book
 
 
 class MySQLPersistence(BookManager):
-    def __init__(self, c: DBConfig):
+    def __init__(self, c: DBConfig, page_size: int):
+        self.page_size = page_size
         self.conn = mysql.connector.connect(
             host=c.host,
             port=c.port,
@@ -60,9 +61,9 @@ class MySQLPersistence(BookManager):
             return None
         return Book(**result)
 
-    def get_books(self) -> List[Book]:
+    def get_books(self, offset: int) -> List[Book]:
         self.cursor.execute('''
-            SELECT * FROM books
-        ''')
+            SELECT * FROM books LIMIT %s, %s
+        ''', (offset, self.page_size))
         results: List[Any] = self.cursor.fetchall()
         return [Book(**result) for result in results]

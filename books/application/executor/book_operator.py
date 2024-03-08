@@ -23,13 +23,14 @@ class BookOperator():
     def get_book(self, id: int) -> Optional[Book]:
         return self.book_manager.get_book(id)
 
-    def get_books(self) -> List[Book]:
-        v = self.cache_helper.load(BOOKS_KEY)
+    def get_books(self, offset: int) -> List[Book]:
+        k = f"{BOOKS_KEY}-{offset}"
+        v = self.cache_helper.load(k)
         if v:
             return json.loads(v)
-        books = self.book_manager.get_books()
+        books = self.book_manager.get_books(offset)
         self.cache_helper.save(
-            BOOKS_KEY, json.dumps([_convert(b) for b in books]))
+            k, json.dumps([_convert(b) for b in books]))
         return books
 
     def update_book(self, id: int, b: Book) -> Book:

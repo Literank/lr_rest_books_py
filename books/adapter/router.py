@@ -15,7 +15,8 @@ class RestHandler:
 
     def get_books(self):
         try:
-            books = self.book_operator.get_books()
+            offset = request.args.get("o", type=int) or 0
+            books = self.book_operator.get_books(offset)
             return jsonify(books), 200
         except Exception as e:
             self._logger.error(f"Failed to get books: {e}")

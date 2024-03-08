@@ -12,7 +12,7 @@ class WireHelper:
 
     @classmethod
     def new(cls, c: Config):
-        db = MySQLPersistence(c.db)
+        db = MySQLPersistence(c.db, c.app.page_size)
         mdb = MongoPersistence(c.db.mongo_uri, c.db.mongo_db_name)
         kv = RedisCache(c.cache)
         return cls(db, mdb, kv)

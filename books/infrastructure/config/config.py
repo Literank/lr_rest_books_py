@@ -25,6 +25,7 @@ class CacheConfig:
 @dataclass
 class ApplicationConfig:
     port: int
+    page_size: int
 
 
 @dataclass
