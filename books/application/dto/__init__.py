@@ -1,1 +1,1 @@
-from .user import User, UserCredential
+from .user import User, UserCredential, UserToken

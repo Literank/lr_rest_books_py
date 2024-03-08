@@ -1,7 +1,9 @@
 import logging
 from flask import Flask, request, jsonify
+from books.adapter.middleware import perm_check
 
 from books.application.dto import UserCredential
+from books.domain.model.user import UserPermission
 from ..application.executor import BookOperator, ReviewOperator, UserOperator
 from ..application import WireHelper
 from ..domain.model import Book, Review
@@ -138,15 +140,15 @@ def make_router(app: Flask, wire_helper: WireHelper):
             wire_helper.book_manager(),
             wire_helper.cache_helper()),
         ReviewOperator(wire_helper.review_manager()),
-        UserOperator(wire_helper.user_manager()))
+        UserOperator(wire_helper.user_manager(), wire_helper.perm_manager()))
     app.add_url_rule('/', view_func=health)
     app.add_url_rule('/books', view_func=rest_handler.get_books)
     app.add_url_rule('/books/<int:id>', view_func=rest_handler.get_book)
-    app.add_url_rule('/books', view_func=rest_handler.create_book,
+    app.add_url_rule('/books', view_func=perm_check(wire_helper.perm_manager(), UserPermission.PermAuthor)(rest_handler.create_book),
                      methods=['POST'])
-    app.add_url_rule('/books/<int:id>', view_func=rest_handler.update_book,
+    app.add_url_rule('/books/<int:id>', view_func=perm_check(wire_helper.perm_manager(), UserPermission.PermAuthor)(rest_handler.update_book),
                      methods=['PUT'])
-    app.add_url_rule('/books/<int:id>', view_func=rest_handler.delete_book,
+    app.add_url_rule('/books/<int:id>', view_func=perm_check(wire_helper.perm_manager(), UserPermission.PermAuthor)(rest_handler.delete_book),
                      methods=['DELETE'])
     app.add_url_rule('/books/<int:book_id>/reviews',
                      view_func=rest_handler.get_reviews_of_book)

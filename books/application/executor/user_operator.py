@@ -4,9 +4,9 @@ import random
 import time
 from typing import Optional
 
-from books.application.dto import UserCredential, User
-from books.domain.gateway import UserManager
-from books.domain.model import User as DomainUser
+from books.application.dto import UserCredential, User, UserToken
+from books.domain.gateway import UserManager, PermissionManager
+from books.domain.model import User as DomainUser, UserPermission
 
 SALT_LEN = 4
 ERR_EMPTY_EMAIL = "empty email"
@@ -14,8 +14,9 @@ ERR_EMPTY_PASSWORD = "empty password"
 
 
 class UserOperator:
-    def __init__(self, user_manager: UserManager):
+    def __init__(self, user_manager: UserManager, perm_manager: PermissionManager):
         self.user_manager = user_manager
+        self.perm_manager = perm_manager
 
     def create_user(self, uc: UserCredential) -> Optional[User]:
         if not uc.email:
@@ -33,7 +34,7 @@ class UserOperator:
         uid = self.user_manager.create_user(user)
         return User(id=uid, email=uc.email)
 
-    def sign_in(self, email: str, password: str) -> Optional[User]:
+    def sign_in(self, email: str, password: str) -> Optional[UserToken]:
         if not email:
             raise ValueError(ERR_EMPTY_EMAIL)
         if not password:
@@ -45,7 +46,12 @@ class UserOperator:
         password_hash = sha1_hash(password + user.salt)
         if user.password != password_hash:
             raise ValueError("wrong password")
-        return User(id=user.id, email=user.email)
+        token = self.perm_manager.generate_token(
+            user.id, user.email,
+            UserPermission.PermAdmin if user.is_admin else UserPermission.PermUser)
+        return UserToken(
+            User(id=user.id, email=user.email),
+            token)
 
 
 def random_string(length: int) -> str:

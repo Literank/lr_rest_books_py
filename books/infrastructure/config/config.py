@@ -26,6 +26,8 @@ class CacheConfig:
 class ApplicationConfig:
     port: int
     page_size: int
+    token_secret: str
+    token_hours: int
 
 
 @dataclass

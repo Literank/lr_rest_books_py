@@ -11,3 +11,9 @@ class UserCredential:
 class User:
     id: int
     email: str
+
+
+@dataclass
+class UserToken:
+    user: User
+    token: str
