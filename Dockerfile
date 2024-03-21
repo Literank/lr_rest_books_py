@@ -15,7 +15,7 @@ RUN pip install gunicorn
 COPY books/ /app/books
 COPY main.py /app
 
-# Expose port 8000
+# Expose port
 EXPOSE 5000
 
 # Command to run the Flask application with Gunicorn
